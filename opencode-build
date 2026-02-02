@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GREEN='\033[0;32m'; BLUE='\033[0;34m'; NC='\033[0m'
+
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}🔨 Сборка OpenCode образа с Python${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+
+cd "$SCRIPT_DIR"
+echo -e "${BLUE}Сборка образа...${NC}"
+docker build -t opencode-python:latest .
+
+echo ""
+echo -e "${GREEN}✅ Образ собран: opencode-python:latest${NC}"
+echo ""
+echo -e "Чтобы использовать свой образ, замените в скриптах:"
+echo -e "  ${BLUE}ghcr.io/anomalyco/opencode:latest${NC} → ${GREEN}opencode-python:latest${NC}"
