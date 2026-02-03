@@ -43,7 +43,7 @@ cd /path/to/your-project
 ├── opencode-web           # ⭐ Web interface
 ├── opencode.json          # MCP servers config
 ├── .opencode/             # Default rules for all projects
-└── data/                  # Cache, auth (not in git)
+└── data/                  # Cache, auth, pip cache (not in git)
 
 ~/projects/my-app/         # Your projects
 ├── .opencode/             # Optional: project-specific rules
@@ -89,3 +89,16 @@ BRAVE_API_KEY=your_key_here
 - Full documentation: `README.md`
 - MCP servers guide: `.opencode/MCP_GUIDE.md`
 - Development rules: `.opencode/rules/*.md`
+
+## 🐳 Docker Image
+
+This setup uses a custom Docker image with Python tools:
+
+**First time build** (already done for you):
+```bash
+~/opencode-setup/opencode-build
+```
+
+**Pre-installed**: pandas, numpy, requests, black, flake8, pytest, ipython
+
+**Image size**: 619MB (vs 227MB base)

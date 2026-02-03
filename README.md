@@ -37,7 +37,8 @@ cd /path/to/your-project
 ├── opencode-build             # Script to build custom Docker image
 ├── opencode-stop              # Script to stop all containers
 ├── opencode-ps                # Script to show container status
-├── Dockerfile                 # Custom image with Python tools
+├── Dockerfile                 # Custom image with Python tools (+392MB)
+├── .dockerignore              # Docker build exclusions
 ├── .opencode/                 # Portable OpenCode config (in git)
 │   ├── rules/                 # Development rules per technology
 │   │   ├── python.md          # Python best practices
@@ -51,7 +52,8 @@ cd /path/to/your-project
 └── data/                      # NOT in git - cache, auth, history
     ├── auth/                  # Authentication tokens
     ├── config/                # Global OpenCode config
-    └── cache/                 # Cache and temporary files
+    ├── cache/                 # Cache and temporary files
+    └── pip-cache/             # Pip package cache (persistent)
 
 ~/projects/                    # Your various projects
 ├── my-python-app/             # Each project has:
@@ -105,6 +107,37 @@ cd ~/projects/project-b
 ~/bin/opencode    # Uses project-b/.opencode/config
 ```
 
+## 🐳 Custom Docker Image
+
+This setup includes a custom Docker image built on top of `ghcr.io/anomalyco/opencode:latest` with additional Python tools:
+
+### Pre-installed Python Packages
+
+| Package | Purpose |
+|---------|---------|
+| `requests` | HTTP library |
+| `pandas` | Data manipulation |
+| `numpy` | Numerical computing |
+| `black` | Code formatter |
+| `flake8` | Linter |
+| `pytest` | Testing framework |
+| `ipython` | Enhanced REPL |
+
+### Image Size
+
+| Image | Size |
+|-------|------|
+| Base `opencode:latest` | 227MB |
+| Custom `opencode-python:latest` | 619MB |
+
+### Rebuilding the Image
+
+If you modify `Dockerfile`:
+
+```bash
+./opencode-build
+```
+
 ## 🔧 Docker Volumes Explained
 
 ```bash
@@ -112,6 +145,7 @@ cd ~/projects/project-b
 -v "$SCRIPT_DIR/data/auth:/root/.local/share/opencode"   # Auth tokens (shared)
 -v "$SCRIPT_DIR/data/config:/root/.config/opencode"      # Global config (shared)
 -v "$SCRIPT_DIR/data/cache:/root/.cache/opencode"        # Cache (shared)
+-v "$SCRIPT_DIR/data/pip-cache:/root/.cache/pip"         # Pip cache (shared)
 
 # From PROJECT_DIR (where you run the script from):
 -v "$PROJECT_DIR:/workspace"                              # Project files
@@ -120,6 +154,13 @@ cd ~/projects/project-b
 # SSH keys (read-only)
 -v "$HOME/.ssh:/root/.ssh:ro"
 ```
+
+### Why Pip Cache?
+
+The `pip-cache` volume persists downloaded packages between container runs, so:
+- Reinstalling the same package is instant (cached)
+- AI agent can install new packages without re-downloading
+- Cache survives `docker run --rm`
 
 ### What Gets Committed to Git?
 

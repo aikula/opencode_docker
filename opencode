@@ -73,6 +73,7 @@ docker run -it --rm --name "$CONTAINER_NAME" \
     -v "$SCRIPT_DIR/data/auth:/root/.local/share/opencode" \
     -v "$SCRIPT_DIR/data/config:/root/.config/opencode" \
     -v "$SCRIPT_DIR/data/cache:/root/.cache/opencode" \
+    -v "$SCRIPT_DIR/data/pip-cache:/root/.cache/pip" \
     -v "$PROJECT_DIR:/workspace" \
     -v "$PROJECT_DIR/.opencode:/workspace/.opencode" \
     -v "$HOME/.ssh:/root/.ssh:ro" -w /workspace \
@@ -84,7 +85,7 @@ docker run -it --rm --name "$CONTAINER_NAME" \
     -e GH_TOKEN="$GH_TOKEN" \
     -e GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-OpenCode}" \
     -e GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-agent@opencode.local}" \
-    ghcr.io/anomalyco/opencode:latest
+    opencode-python:latest
 
 echo ""
 echo -e "${GREEN}✅ Завершено${NC}"

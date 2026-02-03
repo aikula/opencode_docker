@@ -37,7 +37,8 @@ cd /path/to/your-project
 ├── opencode-build             # Скрипт для сборки кастомного Docker образа
 ├── opencode-stop              # Скрипт для остановки всех контейнеров
 ├── opencode-ps                # Скрипт для статуса контейнеров
-├── Dockerfile                 # Кастомный образ с Python инструментами
+├── Dockerfile                 # Кастомный образ с Python инструментами (+392MB)
+├── .dockerignore              # Исключения для Docker сборки
 ├── .opencode/                 # Портативная конфигурация OpenCode (в git)
 │   ├── rules/                 # Правила разработки по технологиям
 │   │   ├── python.md          # Best practices для Python
@@ -51,7 +52,8 @@ cd /path/to/your-project
 └── data/                      # НЕ в git - кэш, auth, история
     ├── auth/                  # Токены авторизации
     ├── config/                # Глобальная конфигурация OpenCode
-    └── cache/                 # Кэш и временные файлы
+    ├── cache/                 # Кэш и временные файлы
+    └── pip-cache/             # Кэш pip пакетов (персистентный)
 
 ~/projects/                    # Ваши различные проекты
 ├── my-python-app/             # Каждый проект имеет:
@@ -105,6 +107,37 @@ cd ~/projects/project-b
 ~/bin/opencode    # Использует project-b/.opencode/config
 ```
 
+## 🐳 Кастомный Docker образ
+
+Эта настройка включает кастомный Docker образ, собранный на основе `ghcr.io/anomalyco/opencode:latest` с дополнительными Python инструментами:
+
+### Предустановленные Python пакеты
+
+| Пакет | Назначение |
+|-------|------------|
+| `requests` | HTTP библиотека |
+| `pandas` | Манипуляция данными |
+| `numpy` | Численные вычисления |
+| `black` | Форматировщик кода |
+| `flake8` | Линтер |
+| `pytest` | Фреймворк для тестов |
+| `ipython` | Улучшенный REPL |
+
+### Размер образа
+
+| Образ | Размер |
+|-------|-------|
+| Базовый `opencode:latest` | 227MB |
+| Кастомный `opencode-python:latest` | 619MB |
+
+### Пересборка образа
+
+Если вы изменили `Dockerfile`:
+
+```bash
+./opencode-build
+```
+
 ## 🔧 Docker volumes объяснение
 
 ```bash
@@ -112,6 +145,7 @@ cd ~/projects/project-b
 -v "$SCRIPT_DIR/data/auth:/root/.local/share/opencode"   # Токены авторизации (общие)
 -v "$SCRIPT_DIR/data/config:/root/.config/opencode"      # Глобальная конфигурация (общая)
 -v "$SCRIPT_DIR/data/cache:/root/.cache/opencode"        # Кэш (общий)
+-v "$SCRIPT_DIR/data/pip-cache:/root/.cache/pip"         # Кэш pip (общий)
 
 # Из PROJECT_DIR (откуда запускаете скрипт):
 -v "$PROJECT_DIR:/workspace"                              # Файлы проекта
@@ -120,6 +154,13 @@ cd ~/projects/project-b
 # SSH ключи (read-only)
 -v "$HOME/.ssh:/root/.ssh:ro"
 ```
+
+### Зачем pip-cache?
+
+Том `pip-cache` сохраняет скачанные пакеты между запусками контейнера, поэтому:
+- Переустановка того же пакета мгновенная (из кэша)
+- AI-агент может устанавливать новые пакеты без повторной загрузки
+- Кэш переживает `docker run --rm`
 
 ### Что попадает в Git?
 

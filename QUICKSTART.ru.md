@@ -43,7 +43,7 @@ cd /path/to/your-project
 ├── opencode-web           # ⭐ Веб-интерфейс
 ├── opencode.json          # Конфигурация MCP серверов
 ├── .opencode/             # Правила по умолчанию для всех проектов
-└── data/                  # Кэш, авторизация (не в git)
+└── data/                  # Кэш, авторизация, pip кэш (не в git)
 
 ~/projects/my-app/         # Ваши проекты
 ├── .opencode/             # Опционально: правила для конкретного проекта
@@ -89,3 +89,16 @@ BRAVE_API_KEY=your_key_here
 - Полная документация: `README.md`
 - Гайд по MCP серверам: `.opencode/MCP_GUIDE.md`
 - Правила разработки: `.opencode/rules/*.md`
+
+## 🐳 Docker образ
+
+Эта настройка использует кастомный Docker образ с Python инструментами:
+
+**Первая сборка** (уже сделана для вас):
+```bash
+~/opencode-setup/opencode-build
+```
+
+**Предустановлено**: pandas, numpy, requests, black, flake8, pytest, ipython
+
+**Размер образа**: 619MB (против 227MB базового)

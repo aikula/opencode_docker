@@ -1,0 +1,79 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation (not needed in container)
+*.md
+LICENSE
+CHANGELOG*
+AGENTS.md
+AGENTS.ru.md
+QUICKSTART.md
+QUICKSTART.ru.md
+
+# Environment files (mounted as volumes at runtime)
+.env
+.env.*
+!.env.example
+
+# Data directories (mounted as volumes, not in image)
+data/
+cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (from cache/data)
+node_modules/
+**/node_modules/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Docker files (not needed inside container)
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Build scripts (not needed inside container)
+install.sh
+opencode-build
+opencode-stop
+opencode-ps
+
+# Claude local files
+.claude/
+.claude-cache/
+.clinerules*

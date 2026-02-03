@@ -62,6 +62,7 @@ docker run $DETACH $IT_FLAG --rm \
     -v "$SCRIPT_DIR/data/auth:/root/.local/share/opencode" \
     -v "$SCRIPT_DIR/data/config:/root/.config/opencode" \
     -v "$SCRIPT_DIR/data/cache:/root/.cache/opencode" \
+    -v "$SCRIPT_DIR/data/pip-cache:/root/.cache/pip" \
     -v "$PROJECT_DIR:/workspace" \
     -v "$PROJECT_DIR/.opencode:/workspace/.opencode" \
     -v "$HOME/.ssh:/root/.ssh:ro" \
@@ -83,7 +84,7 @@ docker run $DETACH $IT_FLAG --rm \
     -e POSTGRES_DATABASE="${POSTGRES_DATABASE:-}" \
     -e BRAVE_API_KEY="${BRAVE_API_KEY:-}" \
     -e EXA_API_KEY="${EXA_API_KEY:-}" \
-    ghcr.io/anomalyco/opencode:latest web --port ${SERVER_PORT} --hostname 0.0.0.0
+    opencode-python:latest web --port ${SERVER_PORT} --hostname 0.0.0.0
 
 if [ ! -z "$DETACH" ]; then
     echo ""
