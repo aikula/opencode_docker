@@ -4,6 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(pwd)"
 PROJECT_NAME="$(basename "$PROJECT_DIR")"
 CONTAINER_NAME="opencode-web-${PROJECT_NAME}"
+OPENCODE_IMAGE="${OPENCODE_IMAGE:-opencode-python:latest}"
 
 GREEN='\033[0;32m'; BLUE='\033[0;34m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
 
@@ -14,6 +15,7 @@ echo ""
 echo -e "📁 Проект:      ${GREEN}$PROJECT_NAME${NC}"
 echo -e "📂 Директория:  ${BLUE}$PROJECT_DIR${NC}"
 echo -e "🐳 Контейнер:   ${GREEN}$CONTAINER_NAME${NC}"
+echo -e "🧱 Образ:       ${GREEN}$OPENCODE_IMAGE${NC}"
 echo ""
 
 if [ -f "$SCRIPT_DIR/.env" ]; then
@@ -84,7 +86,7 @@ docker run $DETACH $IT_FLAG --rm \
     -e POSTGRES_DATABASE="${POSTGRES_DATABASE:-}" \
     -e BRAVE_API_KEY="${BRAVE_API_KEY:-}" \
     -e EXA_API_KEY="${EXA_API_KEY:-}" \
-    opencode-python:latest web --port ${SERVER_PORT} --hostname 0.0.0.0
+    "$OPENCODE_IMAGE" web --port ${SERVER_PORT} --hostname 0.0.0.0
 
 if [ ! -z "$DETACH" ]; then
     echo ""

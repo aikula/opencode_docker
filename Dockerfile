@@ -1,22 +1,45 @@
-# Optimized Dockerfile for OpenCode Development Environment (Alpine Linux)
 FROM ghcr.io/anomalyco/opencode:latest
 
-# System packages - keeps index for runtime installs
-# Alpine uses apk, minimal packages to reduce size
-RUN apk update && \
-    apk add \
-    python3 \
-    py3-pip \
-    git \
-    curl \
-    jq \
-    && rm -rf /var/cache/apk/*.apk /tmp/* /var/tmp/*
+RUN set -eux; \
+    if command -v apk >/dev/null 2>&1; then \
+        apk add --no-cache \
+            gcompat \
+            libc6-compat \
+            python3 \
+            py3-pip \
+            py3-virtualenv \
+            git \
+            curl \
+            wget \
+            jq \
+            vim; \
+        ln -sf /usr/bin/python3 /usr/bin/python; \
+    elif command -v apt-get >/dev/null 2>&1; then \
+        apt-get update; \
+        apt-get install -y --no-install-recommends \
+            python3 \
+            python3-pip \
+            python3-venv \
+            python-is-python3 \
+            git \
+            curl \
+            wget \
+            jq \
+            vim; \
+        rm -rf /var/lib/apt/lists/*; \
+    else \
+        echo "Unsupported base image: neither apk nor apt-get found" >&2; \
+        exit 1; \
+    fi
 
-# Python packages - PEP 668 workaround
-# --break-system-packages is safe in isolated container
-# --prefer-binary uses precompiled wheels for faster installs
-RUN python3 -m pip install --upgrade pip --no-cache-dir --break-system-packages && \
-    pip install --no-cache-dir --prefer-binary --break-system-packages \
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN python3 -m venv "$VIRTUAL_ENV"
+
+RUN "$VIRTUAL_ENV/bin/python" -m pip install --upgrade pip
+
+RUN "$VIRTUAL_ENV/bin/pip" install --no-cache-dir \
     requests \
     pandas \
     numpy \
@@ -25,11 +48,8 @@ RUN python3 -m pip install --upgrade pip --no-cache-dir --break-system-packages 
     pytest \
     ipython
 
-# Git configuration
 RUN git config --global user.name "OpenCode Agent" && \
-    git config --global user.email "agent@opencode.local" && \
-    git config --global core.autocrlf false && \
-    git config --global init.defaultBranch main
+    git config --global user.email "agent@opencode.local"
 
 WORKDIR /workspace
 ENTRYPOINT ["opencode"]

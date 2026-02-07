@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-GREEN='\033[0;32m'; BLUE='\033[0;34m'; YELLOW='\033[1;33m'; NC='\033[0m'
+GREEN='\033[0;32m'; BLUE='\033[0;34m'; NC='\033[0m'
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}🔨 Сборка OpenCode образа с Python${NC}"
@@ -15,21 +15,5 @@ docker build -t opencode-python:latest .
 echo ""
 echo -e "${GREEN}✅ Образ собран: opencode-python:latest${NC}"
 echo ""
-
-# Show image size
-IMAGE_SIZE=$(docker images opencode-python:latest --format "{{.Size}}")
-echo -e "${BLUE}📦 Размер образа: ${GREEN}${IMAGE_SIZE}${NC}"
-echo ""
-
-# Compare with base image if available
-if docker image inspect ghcr.io/anomalyco/opencode:latest &>/dev/null; then
-    BASE_SIZE=$(docker images ghcr.io/anomalyco/opencode:latest --format "{{.Size}}")
-    echo -e "${BLUE}📊 Базовый образ: ${YELLOW}${BASE_SIZE}${NC}"
-    echo ""
-fi
-
-echo -e "${GREEN}✨ Образ готов к использованию!${NC}"
-echo ""
-echo -e "Скрипты уже настроены на использование нового образа:"
-echo -e "  ${BLUE}./opencode${NC}     - запуск CLI"
-echo -e "  ${BLUE}./opencode-web${NC} - запуск web-интерфейса"
+echo -e "Чтобы использовать свой образ, замените в скриптах:"
+echo -e "  ${BLUE}ghcr.io/anomalyco/opencode:latest${NC} → ${GREEN}opencode-python:latest${NC}"
