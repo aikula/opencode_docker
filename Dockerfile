@@ -1,13 +1,8 @@
-# TODO: pin to a specific version tag for reproducible builds
-# Check available tags: https://github.com/anomalyco/opencode/pkgs/container/opencode
-# Example: FROM ghcr.io/anomalyco/opencode:0.3.85
 FROM ghcr.io/anomalyco/opencode:latest
 
 RUN set -eux; \
     if command -v apk >/dev/null 2>&1; then \
         apk add --no-cache \
-            gcompat \
-            libc6-compat \
             python3 \
             py3-pip \
             py3-virtualenv \
@@ -15,12 +10,9 @@ RUN set -eux; \
             curl \
             wget \
             jq \
-            vim \
-            docker-cli; \
-        ln -sf /usr/bin/python3 /usr/bin/python; \
+            vim; \
     elif command -v apt-get >/dev/null 2>&1; then \
-        apt-get update; \
-        apt-get install -y --no-install-recommends \
+        apt-get update && apt-get install -y \
             python3 \
             python3-pip \
             python3-venv \
@@ -30,21 +22,21 @@ RUN set -eux; \
             wget \
             jq \
             vim \
-            docker.io; \
-        rm -rf /var/lib/apt/lists/*; \
+            && rm -rf /var/lib/apt/lists/*; \
     else \
-        echo "Unsupported base image: neither apk nor apt-get found" >&2; \
+        echo "Unsupported base image: no apk or apt-get found" >&2; \
         exit 1; \
+    fi; \
+    if ! command -v python >/dev/null 2>&1; then \
+        ln -sf "$(command -v python3)" /usr/local/bin/python; \
     fi
 
-ENV VIRTUAL_ENV=/opt/venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+ENV PATH="/opt/venv/bin:${PATH}"
 
-RUN python3 -m venv "$VIRTUAL_ENV"
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/python -m pip install --upgrade pip
 
-RUN "$VIRTUAL_ENV/bin/python" -m pip install --upgrade pip
-
-RUN "$VIRTUAL_ENV/bin/pip" install --no-cache-dir \
+RUN /opt/venv/bin/pip install --no-cache-dir \
     requests \
     pandas \
     numpy \
