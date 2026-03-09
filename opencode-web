@@ -18,20 +18,28 @@ echo -e "🐳 Контейнер:   ${GREEN}$CONTAINER_NAME${NC}"
 echo -e "🧱 Образ:       ${GREEN}$OPENCODE_IMAGE${NC}"
 echo ""
 
-if [ -f "$SCRIPT_DIR/.env" ]; then
-    set -a; source "$SCRIPT_DIR/.env"; set +a
-    echo -e "${GREEN}✅ Конфигурация (скрипты): $SCRIPT_DIR/.env${NC}"
+if [ -f "$PROJECT_DIR/.env" ]; then
+    set -a; source "$PROJECT_DIR/.env"; set +a
+    echo -e "${GREEN}✅ Конфигурация: $PROJECT_DIR/.env${NC}"
 else
-    echo -e "${RED}❌ Файл .env не найден в $SCRIPT_DIR${NC}"
-    echo -e "${YELLOW}💡 Создайте .env из .env.example:${NC}"
-    echo -e "   cp ${SCRIPT_DIR}/.env.example ${SCRIPT_DIR}/.env"
-    echo -e "   nano ${SCRIPT_DIR}/.env"
+    echo -e "${RED}❌ Файл .env не найден в $PROJECT_DIR${NC}"
+    echo -e "${YELLOW}💡 Создайте .env из шаблона:${NC}"
+    echo -e "   cp $SCRIPT_DIR/.env.example .env"
+    echo -e "   nano .env"
     exit 1
 fi
 
 # API ключ опционален - можно добавить позже через opencode auth
 if [ -z "$OPENCODE_API_KEY" ] || [ "$OPENCODE_API_KEY" = "your-opencode-zen-api-key-here" ]; then
     echo -e "${YELLOW}⚠️  OPENCODE_API_KEY не настроен - добавьте позже через 'opencode auth'${NC}"
+fi
+
+# Пароль обязателен для веб-интерфейса
+if [ -z "$OPENCODE_SERVER_PASSWORD" ]; then
+    echo -e "${RED}❌ OPENCODE_SERVER_PASSWORD не задан в .env${NC}"
+    echo -e "${YELLOW}💡 Сгенерируйте безопасный пароль и добавьте в .env:${NC}"
+    echo -e "   openssl rand -base64 16"
+    exit 1
 fi
 
 # Use configurable port
@@ -43,7 +51,7 @@ echo ""
 echo -e "   URL:    ${BLUE}http://0.0.0.0:${SERVER_PORT}${NC}"
 echo -e "   Извне: ${BLUE}http://$(hostname -I | awk '{print $1}'):${SERVER_PORT}${NC}"
 echo -e "   Логин:  ${GREEN}opencode${NC}"
-echo -e "   Пароль: ${GREEN}${OPENCODE_SERVER_PASSWORD:-me482482}${NC}"
+echo -e "   Пароль: ${GREEN}*** установлен ***${NC}"
 echo ""
 echo -e "${YELLOW}Нажмите Ctrl+C для остановки${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -66,14 +74,13 @@ docker run $DETACH $IT_FLAG --rm \
     -v "$SCRIPT_DIR/data/cache:/root/.cache/opencode" \
     -v "$SCRIPT_DIR/data/pip-cache:/root/.cache/pip" \
     -v "$PROJECT_DIR:/workspace" \
-    -v "$PROJECT_DIR/.opencode:/workspace/.opencode" \
     -v "$HOME/.ssh:/root/.ssh:ro" \
     -w /workspace \
     -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" \
     -e OPENAI_API_KEY="$OPENAI_API_KEY" \
     -e ZAI_API_KEY="$ZAI_API_KEY" \
     -e OPENCODE_API_KEY="$OPENCODE_API_KEY" \
-    -e OPENCODE_SERVER_PASSWORD="${OPENCODE_SERVER_PASSWORD:-your-secure-password-here}" \
+    -e OPENCODE_SERVER_PASSWORD="$OPENCODE_SERVER_PASSWORD" \
     -e LLM_PROVIDER="${LLM_PROVIDER:-opencode}" \
     -e GH_TOKEN="$GH_TOKEN" \
     -e GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-OpenCode Agent}" \
