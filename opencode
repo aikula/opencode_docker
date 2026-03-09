@@ -18,11 +18,15 @@ echo -e "🐳 Контейнер:   ${GREEN}$CONTAINER_NAME${NC}"
 echo -e "🧱 Образ:       ${GREEN}$OPENCODE_IMAGE${NC}"
 echo ""
 
-if [ -f "$SCRIPT_DIR/.env" ]; then
-    set -a; source "$SCRIPT_DIR/.env"; set +a
-    echo -e "${GREEN}✅ Конфигурация: $SCRIPT_DIR/.env${NC}"
+if [ -f "$PROJECT_DIR/.env" ]; then
+    set -a; source "$PROJECT_DIR/.env"; set +a
+    echo -e "${GREEN}✅ Конфигурация: $PROJECT_DIR/.env${NC}"
 else
-    echo -e "${RED}❌ Файл .env не найден${NC}"; exit 1
+    echo -e "${RED}❌ Файл .env не найден в $PROJECT_DIR${NC}"
+    echo -e "${YELLOW}💡 Создайте .env из шаблона:${NC}"
+    echo -e "   cp $SCRIPT_DIR/.env.example .env"
+    echo -e "   nano .env"
+    exit 1
 fi
 
 if [ -z "$OPENCODE_API_KEY" ] || [ "$OPENCODE_API_KEY" = "sk-" ]; then
