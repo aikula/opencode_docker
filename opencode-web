@@ -69,6 +69,7 @@ fi
 docker run $DETACH $IT_FLAG --rm \
     --name "$CONTAINER_NAME" \
     -p 0.0.0.0:${SERVER_PORT}:${SERVER_PORT} \
+    -v /var/run/docker.sock:/var/run/docker.sock \
     -v "$SCRIPT_DIR/data/auth:/root/.local/share/opencode" \
     -v "$SCRIPT_DIR/data/config:/root/.config/opencode" \
     -v "$SCRIPT_DIR/data/cache:/root/.cache/opencode" \

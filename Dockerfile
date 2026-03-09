@@ -1,3 +1,6 @@
+# TODO: pin to a specific version tag for reproducible builds
+# Check available tags: https://github.com/anomalyco/opencode/pkgs/container/opencode
+# Example: FROM ghcr.io/anomalyco/opencode:0.3.85
 FROM ghcr.io/anomalyco/opencode:latest
 
 RUN set -eux; \
@@ -12,7 +15,8 @@ RUN set -eux; \
             curl \
             wget \
             jq \
-            vim; \
+            vim \
+            docker-cli; \
         ln -sf /usr/bin/python3 /usr/bin/python; \
     elif command -v apt-get >/dev/null 2>&1; then \
         apt-get update; \
@@ -25,7 +29,8 @@ RUN set -eux; \
             curl \
             wget \
             jq \
-            vim; \
+            vim \
+            docker.io; \
         rm -rf /var/lib/apt/lists/*; \
     else \
         echo "Unsupported base image: neither apk nor apt-get found" >&2; \
